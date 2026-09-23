@@ -15,9 +15,21 @@ public class Biblioteca {
      */
     public static void main(String[] args) {
         // TODO code application logic here
+        Usuario amanda = new Usuario("Amanda",24, "F");
+        Livro l = new Livro("Meu pé de Laranja Lima", "José Mauro de Vasconcelos", true);
+        Sistema sistema = new Sistema();
+        sistema.emprestarLivro(amanda, l);
+        System.out.println(amanda.getLivroEmprestado());
+        System.out.println(l.isEmprestado());
+        Usuario thomas = new Usuario("Thomas", 25, "M");
+        sistema.devolverLivro(amanda, l);
+        System.out.println(amanda.getLivroEmprestado());
+        System.out.println(l.isEmprestado());
+        sistema.emprestarLivro(thomas, l);
+        
+        System.out.println(thomas.livroEmprestado);
     }
-    Usuario fulano = new Usuario("Amanda",24, "F");
-    Livro l = new Livro("Meu pé de Laranja Lima", "José Mauro de Vasconcelos", true);
+    
     
 }
 
