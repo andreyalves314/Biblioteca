@@ -11,13 +11,13 @@ package biblioteca;
 public class Usuario {
     protected String nome;
     protected int idade;
-    protected String sexo;
+    
     protected String livroEmprestado;
 
-    public Usuario(String nome, int idade, String sexo) {
+    public Usuario(String nome, int idade) {
         this.nome = nome;
         this.idade = idade;
-        this.sexo = sexo;
+        
     }
 
     public String getNome() {
@@ -36,13 +36,7 @@ public class Usuario {
         this.idade = idade;
     }
 
-    public String getSexo() {
-        return sexo;
-    }
-
-    public void setSexo(String sexo) {
-        this.sexo = sexo;
-    }
+    
 
     public String getLivroEmprestado() {
         return livroEmprestado;
@@ -52,7 +46,9 @@ public class Usuario {
         this.livroEmprestado = livroEmprestado;
     }
     
-    
+    public boolean podeGerenciarLivros() {
+        return false; // usuário comum nunca pode
+    }    
     
     
 }
@@ -61,7 +57,6 @@ public class Usuario {
 Deve conter:
 - Nome
 - Idade
-- Sexo
 - Getters e Setters
 - Construtor?
 - Metodos(Pegar livro, devolver livro)
