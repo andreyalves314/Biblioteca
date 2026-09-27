@@ -91,7 +91,7 @@ public Livro buscarLivroPorTitulo(String titulo) {
             
            int opcao;
     
-    try {
+    try {//código para evitar erros ao digitar uma opção invalida no menu
         opcao = scanner.nextInt();
         scanner.nextLine();
     } catch (InputMismatchException e) {
