@@ -5,6 +5,7 @@
 package biblioteca;
 import java.util.Scanner;
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 /**
  *
  * @author andrey
@@ -88,10 +89,18 @@ public Livro buscarLivroPorTitulo(String titulo) {
             }
             System.out.println("0 - Sair");
             
-            int opcao = scanner.nextInt();
-            scanner.nextLine(); // limpa a quebra de linha deixada pelo nextInt() 
+           int opcao;
+    
+    try {
+        opcao = scanner.nextInt();
+        scanner.nextLine();
+    } catch (InputMismatchException e) {
+        System.out.println("Entrada inválida. Digite apenas números.");
+        scanner.nextLine();
+        continue; // volta para o topo do while, mostrando o menu de novo
+    }
             switch(opcao){
-                case 1:
+                case 1://emprestimo de livros
                 scanner.nextLine();
     
             System.out.println("Digite seu nome:");
@@ -111,7 +120,7 @@ public Livro buscarLivroPorTitulo(String titulo) {
       }
                     break;
                     
-                case 2:
+                case 2://devolução de livros
                    System.out.println("Digite seu nome:");
     String nomeDevolucao = scanner.nextLine();
     Usuario usuarioDevolucao = buscarUsuarioPorNome(nomeDevolucao);
@@ -132,7 +141,7 @@ public Livro buscarLivroPorTitulo(String titulo) {
                        
                     break;
                     
-                case 3:
+                case 3://listar livros disponiveis
                     System.out.println("Livros disponiveis no momento:");
                     
                      boolean encontrouAlgum = false;
@@ -151,7 +160,7 @@ public Livro buscarLivroPorTitulo(String titulo) {
                     
                     break;
                     
-                case 4:
+                case 4://cadstrar livros(opção dispinivel apenas para o admin)
                
         if (usuarioLogado.podeGerenciarLivros()) {
             System.out.println("Digite o nome do livro:");
@@ -168,14 +177,20 @@ public Livro buscarLivroPorTitulo(String titulo) {
         }
         break;
         
-                case 5:
+                case 5://cadastrar usuarios(tambem só o admin)
             
                    if (usuarioLogado.podeGerenciarLivros()) {
                        
             System.out.println("Digite o nome do novo usuario:");
             String nomeNovoUsuario = scanner.nextLine();
             System.out.println("Digite a idade:");
-            int idadeNovoUsuario = Integer.parseInt(scanner.nextLine());
+            int idadeNovoUsuario;
+            try {//aplicando o try/catch no cadastro de idade
+    idadeNovoUsuario = Integer.parseInt(scanner.nextLine());
+} catch (NumberFormatException e) {
+    System.out.println("Idade inválida. Cadastro cancelado.");
+    break; // sai do case sem continuar o cadastro
+}
             Usuario novoUsuario = new Usuario(nomeNovoUsuario, idadeNovoUsuario);
             cadastrarUsuario(novoUsuario);
                        System.out.println("Usuario cadastrado com sucesso!");
@@ -184,9 +199,10 @@ public Livro buscarLivroPorTitulo(String titulo) {
         }
         break; 
                     
-                case 0:
+                case 0:// fecha a estrutura while e encerra o programa
                     System.out.println("Ate a proxima!");
                     continuar = false;
+                    scanner.close();
             }
         }
         
