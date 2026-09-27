@@ -9,12 +9,25 @@ package biblioteca;
  * @author andre
  */
 public class Admin extends Usuario{
+    private String senha;
     
-    public Admin(String nome, int idade, String sexo) {
-        super(nome, idade, sexo);
+    public Admin(String nome, int idade) {
+        super(nome, idade);
+        this.senha = senha;
     }
     
+    public boolean autenticar(String senhaDigitada) {
+        return this.senha.equals(senhaDigitada);
+    }
+    
+    @Override
+    public boolean podeGerenciarLivros() {
+        return true; // admin sempre pode
+    }
+    
+    
 }
+
 
 /*
 Deve:
