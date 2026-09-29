@@ -1,0 +1,3 @@
+Andrey;25
+Amanda;24
+Clarice;11
