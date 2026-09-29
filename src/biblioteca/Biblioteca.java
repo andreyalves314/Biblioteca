@@ -15,8 +15,7 @@ public class Biblioteca {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        Usuario usuario = new Usuario("Amanda",24);
-        Livro livro = new Livro("Meu pé de Laranja Lima", "José Mauro de Vasconcelos", true);
+        
         Sistema sistema = new Sistema();
         sistema.iniciar();
     }
