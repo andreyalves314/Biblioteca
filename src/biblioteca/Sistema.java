@@ -6,6 +6,10 @@ package biblioteca;
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.FileReader;
 /**
  *
  * @author andrey
@@ -44,7 +48,83 @@ public Livro buscarLivroPorTitulo(String titulo) {
     return null;
 }
     
+public void salvarUsuarios() {
+    try {
+        FileWriter arquivo = new FileWriter("usuarios.txt");
+        
+        for (Usuario usuario : listaUsuarios) {
+            arquivo.write(usuario.getNome() + ";" + usuario.getIdade() + "\n");
+        }
+        
+        arquivo.close();
+    } catch (IOException e) {
+        System.out.println("Erro ao salvar usuários: " + e.getMessage());
+    }
+}
+
+public void carregarUsuarios() {
+    try {
+        BufferedReader leitor = new BufferedReader(new FileReader("usuarios.txt"));
+        String linha;
+        
+        while ((linha = leitor.readLine()) != null) {
+            String[] dados = linha.split(";");
+            String nome = dados[0];
+            int idade = Integer.parseInt(dados[1]);
+            
+            listaUsuarios.add(new Usuario(nome, idade));
+        }
+        
+        leitor.close();
+    } catch (IOException e) {
+        System.out.println("Nenhum arquivo de usuários encontrado. Iniciando lista vazia.");
+    }
+}
+
+public void salvarLivros() {
+    try {
+        FileWriter arquivo = new FileWriter("livros.txt");
+        
+        for (Livro livro : listaLivros) {
+            arquivo.write(livro.getNome() + ";" + livro.getAutor() + ";" 
+                         + livro.isEmprestado() + ";" + livro.isParaMaiores() + "\n");
+        }
+        
+        arquivo.close();
+    } catch (IOException e) {
+        System.out.println("Erro ao salvar livros: " + e.getMessage());
+    }
+}
+
+public void carregarLivros() {
+    try {
+        BufferedReader leitor = new BufferedReader(new FileReader("livros.txt"));
+        String linha;
+        
+        while ((linha = leitor.readLine()) != null) {
+            String[] dados = linha.split(";");
+            String nome = dados[0];
+            String autor = dados[1];
+            boolean emprestado = Boolean.parseBoolean(dados[2]);
+            boolean paraMaiores = Boolean.parseBoolean(dados[3]);
+            
+            Livro livro = new Livro(nome, autor, paraMaiores);
+            livro.setEmprestado(emprestado);
+            
+            listaLivros.add(livro);
+        }
+        
+        leitor.close();
+    } catch (IOException e) {
+        System.out.println("Nenhum arquivo de livros encontrado. Iniciando lista vazia.");
+    }
+}
+
+
     public void iniciar(){
+   
+        carregarUsuarios();
+        carregarLivros();        
         
         Scanner scanner = new Scanner(System.in);
         
@@ -103,40 +183,40 @@ public Livro buscarLivroPorTitulo(String titulo) {
                 case 1://emprestimo de livros
                 scanner.nextLine();
     
-            System.out.println("Digite seu nome:");
-            String nomeDigitado = scanner.nextLine();
-            Usuario usuarioEncontrado = buscarUsuarioPorNome(nomeDigitado);
-    
             System.out.println("Escolha o livro que voce deseja pegar emprestado:");
-            String tituloDigitado = scanner.nextLine();
-            Livro livroEncontrado = buscarLivroPorTitulo(tituloDigitado);
+    String tituloEmprestimo = scanner.nextLine();
+    Livro livroEmprestimo = buscarLivroPorTitulo(tituloEmprestimo);
     
-            if (usuarioEncontrado == null) {
-            System.out.println("Usuário não encontrado. Verifique se ele está cadastrado.");
-            } else if (livroEncontrado == null) {
-            System.out.println("Livro não encontrado.");
-            } else {
-             emprestarLivro(usuarioEncontrado, livroEncontrado);
-      }
+    if (livroEmprestimo == null) {
+        System.out.println("Livro não encontrado.");
+    } else {
+        boolean sucesso = emprestarLivro(usuarioLogado, livroEmprestimo);
+        if (sucesso) {
+            System.out.println("Aproveite sua leitura!");
+            salvarLivros();
+        }
+        // se não teve sucesso, a mensagem de erro já foi exibida dentro do método
+    }
+      
                     break;
                     
                 case 2://devolução de livros
-                   System.out.println("Digite seu nome:");
-    String nomeDevolucao = scanner.nextLine();
-    Usuario usuarioDevolucao = buscarUsuarioPorNome(nomeDevolucao);
-    
+                   
     System.out.println("Digite o titulo do livro que deseja devolver:");
     String tituloDevolucao = scanner.nextLine();
     Livro livroDevolucao = buscarLivroPorTitulo(tituloDevolucao);
     
-    if (usuarioDevolucao == null) {
-        System.out.println("Usuário não encontrado.");
-    } else if (livroDevolucao == null) {
-        System.out.println("Livro não encontrado.");
-    } else {
-        devolverLivro(usuarioDevolucao, livroDevolucao);
+   if (livroDevolucao == null) {
+    System.out.println("Livro não encontrado.");
+} else {
+    boolean sucesso = devolverLivro(usuarioLogado, livroDevolucao);
+    if (sucesso) {
         System.out.println("Livro devolvido. Obrigado!");
+        salvarLivros();
+    } else {
+        System.out.println("Você não possui esse livro emprestado.");
     }
+}
     
                        
                     break;
@@ -171,6 +251,7 @@ public Livro buscarLivroPorTitulo(String titulo) {
             String respostaFaixaEtaria = scanner.nextLine();
             boolean paraMaiores = respostaFaixaEtaria.equalsIgnoreCase("S");
             cadastrarLivro(new Livro(nomeLivro, nomeAutor, paraMaiores));
+            salvarLivros();
             System.out.println("Livro cadastrado com sucesso!");
         } else {
             System.out.println("Opção inválida.");
@@ -193,6 +274,7 @@ public Livro buscarLivroPorTitulo(String titulo) {
 }
             Usuario novoUsuario = new Usuario(nomeNovoUsuario, idadeNovoUsuario);
             cadastrarUsuario(novoUsuario);
+            salvarUsuarios();
                        System.out.println("Usuario cadastrado com sucesso!");
         } else {
             System.out.println("Opção inválida.");
@@ -209,33 +291,28 @@ public Livro buscarLivroPorTitulo(String titulo) {
         
     }
     
-    public void emprestarLivro(Usuario usuario, Livro livro){
-    if(usuario.getIdade() <18 && livro.isParaMaiores() == true){
+    public boolean emprestarLivro(Usuario usuario, Livro livro){
+    if(usuario.getIdade() < 18 && livro.isParaMaiores()){
         System.out.println("Este livro não está disponivel para a sua faixa etária. Desculpe.");
-    }else if(usuario.getIdade()<18 && livro.isParaMaiores() == false){
-        System.out.println("Aproveite sua leitura!");
-            usuario.setLivroEmprestado(livro.getNome());
-            livro.setEmprestado(true);
-    }else if(usuario.getIdade()>18){
-        if(livro.isEmprestado() == false){
-            System.out.println("Aproveite sua leitura!");
-            usuario.setLivroEmprestado(livro.getNome());
-            livro.setEmprestado(true);
-        }else if(livro.isEmprestado()){
-            System.out.println("O livro não está disponivel no momento. Desculpe.");
-        }
-    }   
+        return false;
+    } else if(livro.isEmprestado()){
+        System.out.println("O livro não está disponivel no momento. Desculpe.");
+        return false;
+    } else {
+        usuario.setLivroEmprestado(livro.getNome());
+        livro.setEmprestado(true);
+        return true;
     }
+}
     
-    public void devolverLivro(Usuario usuario, Livro livro){
-        if(usuario.getLivroEmprestado() != null && usuario.getLivroEmprestado().equals(livro.getNome())){
-            usuario.setLivroEmprestado(""); //Obs: é possivel tambem usar "null", mas dá erro ao chaamr o metodo "getLivroEmprestado" na classe principal.
-            livro.setEmprestado(false);
-        }
-        
-        
-        
+    public boolean devolverLivro(Usuario usuario, Livro livro){
+    if(usuario.getLivroEmprestado() != null && usuario.getLivroEmprestado().equals(livro.getNome())){
+        usuario.setLivroEmprestado("");
+        livro.setEmprestado(false);
+        return true;
     }
+    return false;
+}
     
     
 }
