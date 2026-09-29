@@ -1,0 +1,5 @@
+Meu Pe de Laranja Lima;Jose Mauro de Vasconcelos;true;false
+Jurassic Park;Michael Crichton;true;false
+Guia do Mochileiro das Galaxias;Douglas Adams;false;false
+Duna;Frank Herbert;false;true
+A Morte de Ivan Ilitch;Liev Tolstoi;true;false
