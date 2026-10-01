@@ -53,7 +53,8 @@ public void salvarUsuarios() {
         FileWriter arquivo = new FileWriter("usuarios.txt");
         
         for (Usuario usuario : listaUsuarios) {
-            arquivo.write(usuario.getNome() + ";" + usuario.getIdade() + "\n");
+            String livros = String.join(",", usuario.getLivrosEmprestados());
+            arquivo.write(usuario.getNome() + ";" + usuario.getIdade() + ";" + livros + "\n");
         }
         
         arquivo.close();
@@ -68,11 +69,25 @@ public void carregarUsuarios() {
         String linha;
         
         while ((linha = leitor.readLine()) != null) {
-            String[] dados = linha.split(";");
+            
+            if(linha.trim().isEmpty()){
+                continue;
+            }
+            
+            String[] dados = linha.split(";", -1);
             String nome = dados[0];
             int idade = Integer.parseInt(dados[1]);
             
-            listaUsuarios.add(new Usuario(nome, idade));
+            Usuario usuario = new Usuario(nome, idade);
+            
+            if (dados.length > 2 && !dados[2].isEmpty()) {
+                String[] livros = dados[2].split(",");
+                for (String nomeLivro : livros) {
+                    usuario.adicionarLivroEmprestado(nomeLivro);
+                }
+            }
+            
+            listaUsuarios.add(usuario);
         }
         
         leitor.close();
@@ -102,6 +117,11 @@ public void carregarLivros() {
         String linha;
         
         while ((linha = leitor.readLine()) != null) {
+            
+            if (linha.trim().isEmpty()) {
+                continue; // pula linhas vazias
+            }
+            
             String[] dados = linha.split(";");
             String nome = dados[0];
             String autor = dados[1];
@@ -163,9 +183,10 @@ public void carregarLivros() {
             System.out.println("1 - Emprestar livro");
             System.out.println("2 - Devolver livro");
             System.out.println("3 - Listar livros disponiveis");
+            System.out.println("4 - Seus livros emprestados");
             if(usuarioLogado.podeGerenciarLivros()){
-                System.out.println("4 - Cadastrar livros");
-                System.out.println("5 - Cadastrar usuario");
+                System.out.println("5 - Cadastrar livros");
+                System.out.println("6 - Cadastrar usuario");
             }
             System.out.println("0 - Sair");
             
@@ -194,6 +215,7 @@ public void carregarLivros() {
         if (sucesso) {
             System.out.println("Aproveite sua leitura!");
             salvarLivros();
+            salvarUsuarios();
         }
         // se não teve sucesso, a mensagem de erro já foi exibida dentro do método
     }
@@ -213,6 +235,7 @@ public void carregarLivros() {
     if (sucesso) {
         System.out.println("Livro devolvido. Obrigado!");
         salvarLivros();
+        salvarUsuarios();
     } else {
         System.out.println("Você não possui esse livro emprestado.");
     }
@@ -239,8 +262,22 @@ public void carregarLivros() {
     
                     
                     break;
+                
+                case 4://listar livros emprestado(Resolvido após um ajuste no Case 1 e no Case 2(chamar o metódo salvsrUsuario())
                     
-                case 4://cadstrar livros(opção dispinivel apenas para o admin)
+            ArrayList<String> livrosDoUsuario = usuarioLogado.getLivrosEmprestados();
+    
+              if (livrosDoUsuario.isEmpty()) {
+                System.out.println("Você não possui nenhum livro emprestado no momento.");
+              } else {
+                System.out.println("Livros que você tem emprestado:");
+              for (String nomeLivro : livrosDoUsuario) {
+                  System.out.println("- " + nomeLivro);
+        }
+    }
+    break;
+                    
+                case 5://cadstrar livros(opção dispinivel apenas para o admin)
                
         if (usuarioLogado.podeGerenciarLivros()) {
             System.out.println("Digite o nome do livro:");
@@ -258,7 +295,7 @@ public void carregarLivros() {
         }
         break;
         
-                case 5://cadastrar usuarios(tambem só o admin)
+                case 6://cadastrar usuarios(tambem só o admin)
             
                    if (usuarioLogado.podeGerenciarLivros()) {
                        
@@ -267,10 +304,10 @@ public void carregarLivros() {
             System.out.println("Digite a idade:");
             int idadeNovoUsuario;
             try {//aplicando o try/catch no cadastro de idade
-    idadeNovoUsuario = Integer.parseInt(scanner.nextLine());
-} catch (NumberFormatException e) {
-    System.out.println("Idade inválida. Cadastro cancelado.");
-    break; // sai do case sem continuar o cadastro
+            idadeNovoUsuario = Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Idade inválida. Cadastro cancelado.");
+               break; // sai do case sem continuar o cadastro
 }
             Usuario novoUsuario = new Usuario(nomeNovoUsuario, idadeNovoUsuario);
             cadastrarUsuario(novoUsuario);
@@ -299,15 +336,15 @@ public void carregarLivros() {
         System.out.println("O livro não está disponivel no momento. Desculpe.");
         return false;
     } else {
-        usuario.setLivroEmprestado(livro.getNome());
+        usuario.adicionarLivroEmprestado(livro.getNome());
         livro.setEmprestado(true);
         return true;
     }
 }
     
     public boolean devolverLivro(Usuario usuario, Livro livro){
-    if(usuario.getLivroEmprestado() != null && usuario.getLivroEmprestado().equals(livro.getNome())){
-        usuario.setLivroEmprestado("");
+    if(usuario.temLivroEmprestado(livro.getNome())){
+        usuario.removerLivroEmprestado(livro.getNome());
         livro.setEmprestado(false);
         return true;
     }
