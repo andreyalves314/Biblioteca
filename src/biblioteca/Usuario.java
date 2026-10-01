@@ -3,16 +3,15 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package biblioteca;
-
+import java.util.ArrayList;
 /**
  *
  * @author andre
  */
 public class Usuario {
-    protected String nome;
-    protected int idade;
-    
-    protected String livroEmprestado;
+    private String nome;
+    private int idade;
+    private ArrayList<String> livrosEmprestados = new ArrayList<>();
 
     public Usuario(String nome, int idade) {
         this.nome = nome;
@@ -38,12 +37,20 @@ public class Usuario {
 
     
 
-    public String getLivroEmprestado() {
-        return livroEmprestado;
+    public ArrayList<String> getLivrosEmprestados() {
+        return livrosEmprestados;
     }
-
-    public void setLivroEmprestado(String livroEmprestado) {
-        this.livroEmprestado = livroEmprestado;
+    
+    public void adicionarLivroEmprestado(String nomeLivro) {
+        livrosEmprestados.add(nomeLivro);
+    }
+    
+    public void removerLivroEmprestado(String nomeLivro) {
+        livrosEmprestados.remove(nomeLivro);
+    }
+    
+    public boolean temLivroEmprestado(String nomeLivro) {
+        return livrosEmprestados.contains(nomeLivro);
     }
     
     public boolean podeGerenciarLivros() {
